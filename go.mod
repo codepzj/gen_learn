@@ -1,4 +1,4 @@
-module gen_test
+module gen_learn
 
 go 1.22.2
 
