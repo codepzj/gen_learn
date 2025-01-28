@@ -12,16 +12,22 @@ var (
 )
 
 // CreateUser 创建用户
-func CreateUser(id string, username string, password string) {
-	u := domain.User{
-		Id:       id,
-		Username: username,
-		Password: password,
-		Books:    nil,
+func CreateUser[T domain.User | []domain.User](user T) {
+	switch v := any(user).(type) {
+	case domain.User:
+		if err := us.Create(v); err != nil {
+			panic(fmt.Sprintf("创建用户失败：%s", err.Error()))
+		}
+	case []domain.User:
+		for _, u := range v {
+			if err := us.Create(u); err != nil {
+				panic(fmt.Sprintf("创建用户失败：%s", err.Error()))
+			}
+		}
+	default:
+		panic("用户类型不匹配")
 	}
-	if err := us.Create(u); err != nil {
-		panic(fmt.Sprintf("创建用户失败：%s", err.Error()))
-	}
+
 	log.Println("创建用户成功")
 }
 
@@ -34,9 +40,27 @@ func DeleteUser(id string) {
 	log.Println("删除用户成功")
 }
 
+// DeleteAllUser 删除全部用户
+func DeleteAllUser() {
+	if err := us.DeleteAll(); err != nil {
+		panic(err.Error())
+	}
+	log.Println("删除全部用户成功")
+}
+
+// UpdateUser 更新用户
 func UpdateUser(id string, userMap map[string]any) {
 	if err := us.UpdateById(id, userMap); err != nil {
 		panic(fmt.Sprintf("用户 %s 更新失败", id))
 	}
 	log.Println("用户更新成功")
+}
+
+// FindAllUsers 查找所有用户
+func FindAllUsers() {
+	users, err := us.FindAll()
+	if err != nil {
+		panic("查询所有用户失败")
+	}
+	fmt.Println("查询所有用户成功:", users)
 }
