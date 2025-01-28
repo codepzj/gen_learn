@@ -46,6 +46,7 @@ func UpdateBook() {
 	log.Println("更新书籍成功")
 }
 
+// ClearBookAssociation 清除关联
 func ClearBookAssociation() {
 	if bs.Clear() != nil {
 		panic("清除书籍与用户关联失败")
